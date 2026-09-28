@@ -1,7 +1,8 @@
 # CP5 — Cấu hình deploy Railway (dùng nếu bạn chọn Railway).
 #
-# Các biến môi trường KHÔNG khai báo ở đây. Đặt chúng trong dashboard hoặc:
-#     railway variables --set AGENT_API_KEY=...
+# Các biến môi trường KHÔNG khai báo ở đây. Đặt chúng trên service ứng dụng
+# trong dashboard hoặc bằng Railway CLI:
+#     railway variable set AGENT_API_KEY=...
 #
 # Railway tự gán biến PORT — app phải đọc $PORT, đừng cố định 8000.
 

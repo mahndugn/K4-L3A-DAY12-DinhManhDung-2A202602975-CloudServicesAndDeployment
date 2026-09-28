@@ -536,18 +536,23 @@ railway login
 railway init                       # đặt tên project
 railway add --database redis       # tạo Redis, tự sinh biến REDIS_URL
 
-railway variables --set AGENT_API_KEY=<khóa của bạn> \
-                  --set RATE_LIMIT_PER_MINUTE=10 \
-                  --set MONTHLY_BUDGET_USD=10.0 \
-                  --set LOG_LEVEL=INFO
+railway variable set AGENT_API_KEY=<khóa của bạn> \
+                     RATE_LIMIT_PER_MINUTE=10 \
+                     MONTHLY_BUDGET_USD=10.0 \
+                     LOG_LEVEL=INFO
 
 railway up                         # build từ Dockerfile và deploy
 railway domain                     # sinh URL công khai
 railway logs                       # xem log khi có sự cố
 ```
 
-Kiểm tra biến `REDIS_URL` đã được gắn vào service agent chưa (dashboard →
-service → Variables). Railway tự set `PORT` — đừng ghi đè.
+Nếu deploy bằng dashboard, mở **service ứng dụng** (không phải service Redis) →
+**Variables** và thêm các biến trên. Sau khi thêm, bấm **Deploy** cho staged
+changes; chỉ lưu biến mà chưa deploy thì container cũ vẫn tiếp tục chạy.
+
+Kiểm tra `REDIS_URL` đã được gắn vào service ứng dụng chưa. Khi dùng Redis cùng
+project, tạo reference variable tới `REDIS_URL` của service Redis thay vì dùng
+`redis://localhost:6379/0`. Railway tự set `PORT` — đừng ghi đè.
 
 ### Đường Render
 
