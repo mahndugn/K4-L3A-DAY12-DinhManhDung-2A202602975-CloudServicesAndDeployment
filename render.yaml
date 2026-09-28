@@ -5,7 +5,7 @@
 
 services:
   - type: web
-    name: day12-agent
+    name: cloudops-assistant
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
@@ -21,11 +21,11 @@ services:
         value: "10.0"
       - key: REDIS_URL
         fromService:
-          name: day12-redis
+          name: cloudops-redis
           type: redis
           property: connectionString
 
   - type: redis
-    name: day12-redis
+    name: cloudops-redis
     plan: free
     ipAllowList: []

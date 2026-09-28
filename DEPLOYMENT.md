@@ -1,5 +1,9 @@
 # Thông Tin Deploy — Checkpoint 5
 
+Đề tài: **CloudOps Assistant — Trợ lý hỏi đáp về Cloud và Docker**.
+Chế độ hiện tại: FAQ offline, tokens và chi phí USD mô phỏng.
+Chỉ hoàn thiện URL, output và ảnh bên dưới sau khi kiểm tra bản deploy thật.
+
 > Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đọc file này
 > để tìm địa chỉ service của bạn và gọi thử.
 >
@@ -49,14 +53,14 @@ curl -i <URL>/ready
 # 3. Không có API key — mong đợi 401
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
-  -d '{"question":"Hello"}'
+  -d '{"question":"Docker multi-stage là gì?"}'
 
 # 4. Có API key — mong đợi 200 kèm câu trả lời
 curl -i -X POST <URL>/ask \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $AGENT_API_KEY" \
   -H "X-User-Id: sv-test" \
-  -d '{"question":"Deploy là gì?"}'
+  -d '{"question":"Readiness probe khác health check thế nào?"}'
 
 # 5. Rate limit — gọi 15 lần, những lần cuối phải trả 429
 for i in $(seq 1 15); do

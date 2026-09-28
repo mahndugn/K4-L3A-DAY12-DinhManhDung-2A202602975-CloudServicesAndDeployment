@@ -1,5 +1,7 @@
 # Secrets — KHÔNG BAO GIỜ commit
 .env
+.env.*
+!.env.example
 *.pem
 *.key
 

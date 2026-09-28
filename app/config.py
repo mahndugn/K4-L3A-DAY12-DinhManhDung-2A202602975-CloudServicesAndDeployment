@@ -8,6 +8,7 @@ mà không phải sửa một dòng code nào.
 from __future__ import annotations
 
 from functools import lru_cache
+from pydantic import Field
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,7 +16,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Toàn bộ cấu hình của service.
 
-    TODO (CP1): khai báo các trường dưới đây. pydantic-settings tự đọc biến
+    Yêu cầu CP1: khai báo các trường dưới đây. pydantic-settings tự đọc biến
     môi trường theo tên trường (không phân biệt hoa thường), nên trường
     ``agent_api_key`` sẽ lấy giá trị từ biến ``AGENT_API_KEY``.
 
@@ -40,9 +41,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # TODO (CP1): khai báo 6 trường theo bảng trên, ví dụ:
-    #     port: int = 8000
-    #     agent_api_key: str
+    port: int = Field(default=8000, ge=1, le=65535)
+    agent_api_key: str = Field(min_length=1)
+    redis_url: str = "redis://localhost:6379/0"
+    rate_limit_per_minute: int = Field(default=10, ge=1)
+    monthly_budget_usd: float = Field(default=10.0, ge=0, allow_inf_nan=False)
+    log_level: str = "INFO"
 
 
 @lru_cache(maxsize=1)

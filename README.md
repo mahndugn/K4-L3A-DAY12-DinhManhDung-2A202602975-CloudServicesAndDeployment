@@ -1,7 +1,75 @@
-# K4 — Level 3A, Ngày 12: Hạ Tầng Cloud & Deployment (240 phút)
+# CloudOps Assistant — Trợ lý hỏi đáp về Cloud và Docker
 
-Đưa một AI agent từ `localhost:8000` lên một địa chỉ công khai mà người khác
-gọi được, có bảo mật, có giới hạn chi phí, và không sập khi bạn deploy bản mới.
+Đề tài triển khai cho K4 — Level 3A, Ngày 12: Hạ Tầng Cloud & Deployment.
+API FastAPI giúp học viên hỏi về Cloud, Docker và vận hành service.
+
+## Sản phẩm
+
+**CloudOps Assistant — Trợ lý hỏi đáp về Cloud và Docker** là service hỏi đáp
+offline tập trung vào Docker, Redis, health/readiness, bảo mật API, rate limit,
+giới hạn chi phí và deployment cloud. Mock LLM chạy sẵn trong repo nên không cần
+API key của nhà cung cấp LLM; `AGENT_API_KEY` chỉ bảo vệ endpoint `/ask`.
+Đây là FAQ chọn nội dung theo cụm từ từ 16 chủ đề đã biên soạn, không phải LLM
+sinh câu trả lời. Hỗ trợ tiếng Việt có dấu/không dấu và câu nối tiếp
+“giải thích thêm”. Câu ngoài bộ kiến thức nhận gợi ý chủ đề; tokens và USD
+chỉ là số mô phỏng. Không tra cứu thông tin cloud theo thời gian thực.
+
+Ví dụ câu hỏi để demo:
+
+- `Docker multi-stage là gì?`
+- `Readiness probe khác health check thế nào?`
+- `Redis giúp scale agent ra sao?`
+- `Rate limit dùng để làm gì?`
+
+## Chạy trên Windows
+
+Mở Docker Desktop, tạo .env từ .env.example nếu chưa có, rồi đặt
+AGENT_API_KEY riêng trên máy. Không ghi khóa vào tài liệu hoặc Git.
+
+```powershell
+docker compose up -d --build
+docker compose ps
+curl.exe http://localhost:8000/health
+curl.exe http://localhost:8000/ready
+```
+
+Mở [Swagger UI](http://localhost:8000/docs), chọn POST /ask → Try it out,
+nhập X-API-Key từ .env, X-User-Id và câu hỏi. Danh mục gợi ý ở
+[topics](http://localhost:8000/topics). Hướng dẫn chi tiết: [DEMO.md](DEMO.md).
+
+| Endpoint | Mục đích | API key |
+|---|---|---|
+| GET / | Giới thiệu service và chế độ offline | Không |
+| GET /topics | Chủ đề và câu hỏi mẫu | Không |
+| GET /health | Liveness, không gọi Redis | Không |
+| GET /ready | Kiểm tra kết nối Redis | Không |
+| POST /ask | Hỏi đáp, history, quota và cost guard | Có |
+
+Luồng /ask: xác thực → rate limit → cost guard → đọc history → FAQ offline
+→ ghi hai message → ghi chi phí mô phỏng → log JSON.
+
+Kiểm tra code và cấu trúc Docker mà chưa cần cloud:
+
+```powershell
+python -m pytest tests/test_cp1.py tests/test_cp2.py tests/test_cp3.py tests/test_cp4.py tests/test_cloudops.py -v -m "not docker"
+```
+
+Giữ tên repo theo SUBMISSION.md và tên service Compose agent/redis theo bộ test.
+Tài liệu lab gốc phía dưới là yêu cầu học tập; các đoạn “cần sửa” mô tả đề bài,
+không phải báo cáo tình trạng triển khai hiện tại. CP5, ảnh và exercises.md chỉ
+được hoàn thiện bằng kết quả chạy thật.
+
+## Phạm vi bản lab
+
+- X-User-Id do client chọn, chỉ dùng phân chia phiên demo; chưa có tài khoản người dùng.
+- Rate limit chưa atomic giữa các request đồng thời; cost guard chưa giữ chỗ ngân sách.
+- History dùng Redis thật khi chạy Compose; fake:// chỉ dành cho thử nghiệm một process.
+- Compose hiện chạy một agent; scale nhiều instance cần xử lý host port và load balancer.
+- Docker HEALTHCHECK báo trạng thái; Compose không tự restart chỉ vì unhealthy.
+- LOG_LEVEL là trường cấu hình lab; log_event hiện ghi mọi sự kiện, chưa lọc theo mức.
+
+Tham khảo nội dung: [Docker multi-stage](https://docs.docker.com/build/building/multi-stage/)
+và [Kubernetes probes](https://kubernetes.io/docs/concepts/workloads/pods/probes/).
 
 ---
 
