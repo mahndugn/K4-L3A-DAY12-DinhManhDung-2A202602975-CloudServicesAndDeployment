@@ -1,5 +1,7 @@
 # CloudOps Assistant — Trợ lý hỏi đáp về Cloud và Docker
 
+[![CI](https://github.com/mahndugn/K4-L3A-DAY12-DinhManhDung-2A202602975-CloudServicesAndDeployment/actions/workflows/ci.yml/badge.svg)](https://github.com/mahndugn/K4-L3A-DAY12-DinhManhDung-2A202602975-CloudServicesAndDeployment/actions/workflows/ci.yml)
+
 Đề tài triển khai cho K4 — Level 3A, Ngày 12: Hạ Tầng Cloud & Deployment.
 API FastAPI giúp học viên hỏi về Cloud, Docker và vận hành service.
 

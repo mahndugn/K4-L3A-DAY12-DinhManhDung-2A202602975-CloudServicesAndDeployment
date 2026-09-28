@@ -1,0 +1,82 @@
+name: CloudOps Assistant CI/CD
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit and integration tests
+        env:
+          AGENT_API_KEY: ci-dummy
+          REDIS_URL: fake://
+          RATE_LIMIT_PER_MINUTE: "10"
+          MONTHLY_BUDGET_USD: "10.0"
+          LOG_LEVEL: INFO
+        run: >-
+          python -m pytest tests/test_cp1.py tests/test_cp2.py tests/test_cp3.py
+          tests/test_cp4.py
+
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build production image
+        run: docker build --tag cloudops-assistant:ci .
+
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli
+
+      - name: Deploy application
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --ci --yes
+
+      - name: Smoke test production
+        env:
+          PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+        run: |
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error "$PUBLIC_URL/health"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
